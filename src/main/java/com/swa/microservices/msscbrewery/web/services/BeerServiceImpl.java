@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import com.swa.microservices.msscbrewery.web.model.BeerDTO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class BeerServiceImpl implements BeerService {
 
@@ -16,6 +19,26 @@ public class BeerServiceImpl implements BeerService {
 				.beerName("Galaxy Cat")
 				.beerStyle("Pale Ale")
 				.build();
+	}
+
+	@Override
+	public BeerDTO saveNewBeer(BeerDTO beerDto) {
+		
+		return BeerDTO.builder()
+				.id(UUID.randomUUID())
+				.build();
+	}
+
+	@Override
+	public void updateBeer(BeerDTO beerDto, UUID beerId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteById(UUID beerId) {
+		log.debug("Beer is being deleted..");
+		
 	}
 
 }
