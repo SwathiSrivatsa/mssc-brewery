@@ -1,12 +1,18 @@
 package com.swa.microservices.msscbrewery.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+
+import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +45,7 @@ public class CustomerController {
 	}
 	
 	@PostMapping
-	public ResponseEntity handleCustomer(@RequestBody CustomerDTO custDto) {
+	public ResponseEntity handleCustomer(@Valid @RequestBody CustomerDTO custDto) {
 		
 		CustomerDTO savedDto=service.createNewCustomer(custDto);
 		
@@ -51,7 +57,7 @@ public class CustomerController {
 	
 	@PutMapping("/{custId}")
 	public ResponseEntity handleUpdate(@PathVariable("custId") UUID custId, 
-			@RequestBody CustomerDTO custDto) {
+			@Valid @RequestBody CustomerDTO custDto) {
 		
 		service.updateById(custDto,custId);
 		
@@ -63,6 +69,18 @@ public class CustomerController {
 	public void deleteById(@PathVariable("custId") UUID custId) {
 		
 		service.deleteById(custId);
+	}
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<List> validationErrorHandler(ConstraintViolationException e){
+		
+		List<String> errors=new ArrayList<>(e.getConstraintViolations().size());
+		
+		e.getConstraintViolations().forEach(constrainViolation -> {
+			errors.add(constrainViolation.getPropertyPath() + ":" + constrainViolation.getMessage());
+		});
+		
+		return new ResponseEntity<>(errors,HttpStatus.BAD_REQUEST);
 	}
 
 }
